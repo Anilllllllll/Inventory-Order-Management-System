@@ -177,10 +177,19 @@ export const getOrders = async (req, res) => {
     const formattedOrders = orders.map(order => {
       const formattedItems = order.items.map(item => {
         const unitType = getUnitType(item.product.baseUnit);
+        const displayBasePrice = Number(item.unitPrice);
+        const multiplier = item.orderedUnit === 'kg' || item.orderedUnit === 'L' ? 1000 : 1;
+        const displayOrderedPrice = displayBasePrice * multiplier;
+        const baseUnit = item.product.baseUnit;
+
         return {
           ...item,
           friendlyOrdered: `${item.orderedQuantity} ${item.orderedUnit}`,
-          friendlyConverted: formatFriendlyQuantity(item.convertedQuantity, unitType)
+          friendlyConverted: formatFriendlyQuantity(item.convertedQuantity, unitType),
+          baseRate: `₹${displayBasePrice.toFixed(4)} per ${baseUnit}`,
+          orderedRate: `₹${displayOrderedPrice.toFixed(2)} per ${item.orderedUnit}`,
+          multiplierText: `1 ${item.orderedUnit} = ${multiplier} ${baseUnit}`,
+          formulaBreakdown: `${item.orderedQuantity} ${item.orderedUnit} × ${multiplier} = ${item.convertedQuantity} ${baseUnit} | ${item.convertedQuantity} ${baseUnit} × ₹${displayBasePrice.toFixed(4)}/${baseUnit} = ₹${Number(item.subtotal).toFixed(2)}`
         };
       });
 
@@ -237,10 +246,19 @@ export const getOrderById = async (req, res) => {
 
     const formattedItems = order.items.map(item => {
       const unitType = getUnitType(item.product.baseUnit);
+      const displayBasePrice = Number(item.unitPrice);
+      const multiplier = item.orderedUnit === 'kg' || item.orderedUnit === 'L' ? 1000 : 1;
+      const displayOrderedPrice = displayBasePrice * multiplier;
+      const baseUnit = item.product.baseUnit;
+
       return {
         ...item,
         friendlyOrdered: `${item.orderedQuantity} ${item.orderedUnit}`,
-        friendlyConverted: formatFriendlyQuantity(item.convertedQuantity, unitType)
+        friendlyConverted: formatFriendlyQuantity(item.convertedQuantity, unitType),
+        baseRate: `₹${displayBasePrice.toFixed(4)} per ${baseUnit}`,
+        orderedRate: `₹${displayOrderedPrice.toFixed(2)} per ${item.orderedUnit}`,
+        multiplierText: `1 ${item.orderedUnit} = ${multiplier} ${baseUnit}`,
+        formulaBreakdown: `${item.orderedQuantity} ${item.orderedUnit} × ${multiplier} = ${item.convertedQuantity} ${baseUnit} | ${item.convertedQuantity} ${baseUnit} × ₹${displayBasePrice.toFixed(4)}/${baseUnit} = ₹${Number(item.subtotal).toFixed(2)}`
       };
     });
 
@@ -386,6 +404,9 @@ export const previewQuotation = async (req, res) => {
       const subtotal = convertedQuantity * unitPrice;
       quotationTotal += subtotal;
 
+      const multiplier = orderedUnit === 'kg' || orderedUnit === 'L' ? 1000 : 1;
+      const displayOrderedPrice = unitPrice * multiplier;
+
       previewItems.push({
         productId,
         name: product.name,
@@ -396,7 +417,11 @@ export const previewQuotation = async (req, res) => {
         convertedQuantity,
         baseUnit: product.baseUnit,
         unitPrice, // price per base unit
-        friendlyUnitPrice: `₹${(unitPrice * (orderedUnit === 'kg' || orderedUnit === 'L' ? 1000 : 1)).toFixed(2)} per ${orderedUnit}`,
+        friendlyUnitPrice: `₹${displayOrderedPrice.toFixed(2)} per ${orderedUnit}`,
+        baseRate: `₹${unitPrice.toFixed(4)} per ${product.baseUnit}`,
+        orderedRate: `₹${displayOrderedPrice.toFixed(2)} per ${orderedUnit}`,
+        multiplierText: `1 ${orderedUnit} = ${multiplier} ${product.baseUnit}`,
+        formulaBreakdown: `${orderedQuantity} ${orderedUnit} × ${multiplier} = ${convertedQuantity} ${product.baseUnit} | ${convertedQuantity} ${product.baseUnit} × ₹${unitPrice.toFixed(4)}/${product.baseUnit} = ₹${subtotal.toFixed(2)}`,
         subtotal
       });
     }

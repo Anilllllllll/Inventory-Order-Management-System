@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../services/prisma.js';
+import { validateRegistration } from '../utils/validator.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key-12345';
 const JWT_EXPIRES_IN = '24h';
@@ -9,8 +10,9 @@ export const register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email, and password are required' });
+    const validation = validateRegistration({ name, email, password, role });
+    if (!validation.isValid) {
+      return res.status(400).json({ message: validation.errors.join(', '), errors: validation.errors });
     }
 
     const normalizedEmail = email.toLowerCase().trim();

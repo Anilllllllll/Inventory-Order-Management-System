@@ -7,6 +7,7 @@ import {
   formatFriendlyQuantity,
   BASE_UNITS
 } from '../utils/unitConverter.js';
+import { validateProduct } from '../utils/validator.js';
 
 // Get all products (with pagination, search, and filtering)
 export const getProducts = async (req, res) => {
@@ -95,8 +96,9 @@ export const createProduct = async (req, res) => {
   try {
     const { name, sku, category, inputUnit, pricePerUnit, stockQuantity } = req.body;
 
-    if (!name || !category || !inputUnit || pricePerUnit === undefined || stockQuantity === undefined) {
-      return res.status(400).json({ message: 'Missing required product fields' });
+    const validation = validateProduct({ name, category, inputUnit, pricePerUnit, stockQuantity });
+    if (!validation.isValid) {
+      return res.status(400).json({ message: validation.errors.join(', '), errors: validation.errors });
     }
 
     // Determine unit type and target base unit
@@ -162,6 +164,20 @@ export const updateProduct = async (req, res) => {
 
     if (!existingProduct) {
       return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Combine updates with existing fields for validation
+    const testProduct = {
+      name: name !== undefined ? name : existingProduct.name,
+      category: category !== undefined ? category : existingProduct.category,
+      inputUnit: inputUnit !== undefined ? inputUnit : existingProduct.baseUnit,
+      pricePerUnit: pricePerUnit !== undefined ? pricePerUnit : Number(existingProduct.basePrice),
+      stockQuantity: stockQuantity !== undefined ? stockQuantity : Number(existingProduct.stockQuantity)
+    };
+
+    const validation = validateProduct(testProduct);
+    if (!validation.isValid) {
+      return res.status(400).json({ message: validation.errors.join(', '), errors: validation.errors });
     }
 
     const data = {};

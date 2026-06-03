@@ -1,49 +1,45 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-enum Role {
-  ADMIN
-  USER
+  output   = "../server/node_modules/.prisma/client"
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String   @db.VarChar(100)
-  email     String   @unique @db.VarChar(255)
-  password  String   @db.VarChar(255)
-  role      Role     @default(USER)
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("USER") // ADMIN, USER
+  createdAt DateTime @default(now()) @map("created_at")
   orders    Order[]
 
   @@map("users")
 }
 
 model Product {
-  id            String      @id @default(uuid()) @db.Uuid
-  name          String      @db.VarChar(255)
-  sku           String      @unique @db.VarChar(50)
-  category      String      @db.VarChar(100)
-  baseUnit      String      @map("base_unit") @db.VarChar(20)
-  basePrice     Decimal     @map("base_price") @db.Decimal(20, 6)
-  stockQuantity Decimal     @map("stock_quantity") @db.Decimal(20, 6)
-  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  id            String      @id @default(uuid())
+  name          String
+  sku           String      @unique
+  category      String
+  baseUnit      String      @map("base_unit")
+  basePrice     Decimal     @map("base_price")
+  stockQuantity Decimal     @map("stock_quantity")
+  createdAt     DateTime    @default(now()) @map("created_at")
   orderItems    OrderItem[]
 
   @@map("products")
 }
 
 model Order {
-  id          String      @id @default(uuid()) @db.Uuid
-  userId      String      @map("user_id") @db.Uuid
-  status      String      @default("Pending") @db.VarChar(50)
-  totalAmount Decimal     @map("total_amount") @db.Decimal(20, 6)
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  id          String      @id @default(uuid())
+  userId      String      @map("user_id")
+  status      String      @default("Pending")
+  totalAmount Decimal     @map("total_amount")
+  createdAt   DateTime    @default(now()) @map("created_at")
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   items       OrderItem[]
 
@@ -51,14 +47,14 @@ model Order {
 }
 
 model OrderItem {
-  id                String   @id @default(uuid()) @db.Uuid
-  orderId           String   @map("order_id") @db.Uuid
-  productId         String   @map("product_id") @db.Uuid
-  orderedUnit       String   @map("ordered_unit") @db.VarChar(20)
-  orderedQuantity   Decimal  @map("ordered_quantity") @db.Decimal(20, 6)
-  convertedQuantity Decimal  @map("converted_quantity") @db.Decimal(20, 6)
-  unitPrice         Decimal  @map("unit_price") @db.Decimal(20, 6)
-  subtotal          Decimal  @db.Decimal(20, 6)
+  id                String   @id @default(uuid())
+  orderId           String   @map("order_id")
+  productId         String   @map("product_id")
+  orderedUnit       String   @map("ordered_unit")
+  orderedQuantity   Decimal  @map("ordered_quantity")
+  convertedQuantity Decimal  @map("converted_quantity")
+  unitPrice         Decimal  @map("unit_price")
+  subtotal          Decimal
   order             Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 

@@ -399,18 +399,37 @@ const UserDashboard = () => {
                     </div>
 
                     {/* Math Preview (converted) */}
-                    <div className="mt-3 bg-slate-900/40 p-2 rounded-lg border border-slate-900/80 flex flex-col gap-1 text-[10px] text-slate-400 font-medium">
-                      <div className="flex justify-between">
-                        <span>Converted:</span>
-                        <span className="text-violet-300 font-semibold">{item.convertedQuantity} {item.product.baseUnit}</span>
+                    <div className="mt-3 bg-slate-950 border border-slate-900 p-3 rounded-xl flex flex-col gap-1.5 text-[10px] text-slate-400 font-medium font-mono relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-8 h-8 bg-violet-600/5 rounded-full blur-sm"></div>
+                      <div className="flex justify-between border-b border-slate-800/30 pb-1 text-slate-500 font-bold">
+                        <span>CONVERSION RECEIPT</span>
+                        <span className="text-violet-400">MATH LOG</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Rate:</span>
+                        <span>Input Quantity:</span>
+                        <span className="text-slate-300 font-bold">{item.orderedQuantity} {item.orderedUnit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Multiplier:</span>
+                        <span>1 {item.orderedUnit} = {item.orderedUnit === 'kg' || item.orderedUnit === 'L' ? '1,000' : '1'} {item.product.baseUnit}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-800/30 pb-1">
+                        <span>Converted Stock:</span>
+                        <span className="text-violet-300 font-bold">{item.orderedQuantity} × {item.orderedUnit === 'kg' || item.orderedUnit === 'L' ? '1,000' : '1'} = {item.convertedQuantity} {item.product.baseUnit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Base Rate:</span>
+                        <span>₹{basePriceNum.toFixed(4)} / {item.product.baseUnit}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Unit Rate:</span>
                         <span>₹{displayRate.toFixed(2)} / {item.orderedUnit}</span>
                       </div>
-                      <div className="flex justify-between border-t border-slate-800/40 pt-1 mt-0.5 text-xs">
-                        <span className="text-slate-300 font-bold">Subtotal:</span>
-                        <span className="text-emerald-400 font-extrabold">₹{item.subtotal.toFixed(2)}</span>
+                      <div className="flex justify-between border-t border-slate-800/60 pt-2 mt-1 text-xs">
+                        <span className="text-slate-300 font-bold font-sans">Subtotal:</span>
+                        <span className="text-emerald-400 font-extrabold font-sans">
+                          {item.convertedQuantity} × ₹{basePriceNum.toFixed(4)} = ₹{item.subtotal.toFixed(2)}
+                        </span>
                       </div>
                     </div>
                   </div>

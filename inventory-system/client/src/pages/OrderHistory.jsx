@@ -232,6 +232,11 @@ const OrderHistory = () => {
                           <td className="p-3 pl-4">
                             <p className="font-bold text-white text-xs">{item.product.name}</p>
                             <p className="text-[10px] text-slate-500 font-mono">SKU: {item.product.sku}</p>
+                            {item.formulaBreakdown && (
+                              <p className="text-[9px] text-violet-400 font-mono mt-1.5 bg-violet-950/20 p-1 px-2 border border-violet-950 rounded max-w-fit">
+                                {item.formulaBreakdown}
+                              </p>
+                            )}
                           </td>
                           <td className="p-3 text-slate-300 font-medium">
                             {item.orderedQuantity} {item.orderedUnit}
