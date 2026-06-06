@@ -1,4 +1,5 @@
 Inventory & Order Management System
+
 Tech Stack
 Frontend
 React.js
@@ -17,6 +18,13 @@ Deployment
 Frontend: Vercel
 Backend: Render/Railway
 Database: Neon PostgreSQL
+
+<img width="1367" height="746" alt="image" src="https://github.com/user-attachments/assets/b85485a0-58e8-4cd5-98fc-99eac7588bb5" />
+
+
+<img width="1336" height="748" alt="image" src="https://github.com/user-attachments/assets/4ea21aca-bf7a-469d-8fd3-412510869ef2" />
+
+
 User Roles
 Admin
 Login
